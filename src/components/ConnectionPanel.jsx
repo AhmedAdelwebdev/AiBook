@@ -1,0 +1,65 @@
+'use client';
+
+export default function ConnectionPanel({ 
+  googleAccessToken, 
+  onAuthenticate, 
+  onSignOut, 
+  selectedSheetId, 
+  setSelectedSheetId, 
+  spreadsheets, 
+  selectedSheetName, 
+  setSelectedSheetName,
+  isProcessing,
+  onProcess
+}) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {!googleAccessToken ? (
+          <button 
+            onClick={onAuthenticate}
+            className="btn-primary h-16 sm:h-20 rounded-2xl text-xl font-bold flex items-center justify-center gap-4 shadow-2xl transition-all hover:scale-[1.02]"
+          >
+            ربط حساب جوجل
+          </button>
+        ) : (
+          <div className="h-16 sm:h-20 glass rounded-2xl px-8 flex flex-col justify-center border-r-8 border-r-[#00ffa6] shadow-xl">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm font-black tracking-widest text-[#00ffa6] uppercase">ملف البيانات (Spreadsheet)</span>
+              <button onClick={onSignOut} className="text-sm font-bold opacity-40 hover:opacity-100 underline decoration-red-500">تسجيل الخروج</button>
+            </div>
+            <select 
+              value={selectedSheetId} 
+              onChange={e => { setSelectedSheetId(e.target.value); localStorage.setItem('selected_sheet_id', e.target.value); }}
+              className="bg-transparent text-lg md:text-xl font-black outline-none cursor-pointer appearance-none text-white w-full"
+            >
+              <option value="" className="bg-neutral-900">-- اختر الملف --</option>
+              {spreadsheets.map(f => <option key={f.id} value={f.id} className="bg-neutral-900">{f.name}</option>)}
+            </select>
+          </div>
+        )}
+
+        <div className={`h-16 sm:h-20 glass rounded-2xl px-8 flex flex-col justify-center transition-all shadow-xl ${!selectedSheetId ? 'opacity-30 grayscale cursor-not-allowed' : 'opacity-100 border-r-8 border-r-white/20'}`}>
+          <span className="text-sm font-black tracking-widest opacity-40 mb-2">اسم ورقة العمل (Tab)</span>
+          <input 
+            value={selectedSheetName} 
+            onChange={e => { setSelectedSheetName(e.target.value); localStorage.setItem('selected_sheet_name', e.target.value); }}
+            className="bg-transparent text-lg md:text-xl font-black outline-none placeholder:opacity-20 text-white"
+            placeholder="مثال: Sheet1"
+            disabled={!selectedSheetId}
+          />
+        </div>
+      </div>
+
+      <div className="lg:col-span-4 flex items-center">
+         <button 
+          onClick={onProcess} 
+          disabled={isProcessing || !googleAccessToken || !selectedSheetId}
+          className={`w-full h-16 sm:h-20 btn-primary rounded-2xl text-2xl font-black disabled:opacity-20 disabled:grayscale transition-all shadow-[0_20px_60px_rgba(0,255,166,0.3)] hover:scale-[1.05] active:scale-95`}
+        >
+          {isProcessing ? 'جاري المعالجة...' : 'بدء المعالجة'}
+        </button>
+      </div>
+    </div>
+  );
+}

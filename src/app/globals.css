@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0b0b0b;
+  --color-card: #141414;
+  --color-accent: #00ffa6;
+  --color-foreground: #ffffff;
+}
+
+@font-face {
+  font-family: 'Tajawal';
+  src: url('../../public/Tajawal-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(0, 255, 166, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(0, 255, 166, 0.03) 0%, transparent 50%),
+    radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px;
+  background-attachment: fixed;
+  color: var(--color-foreground);
+  font-family: 'Tajawal', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  direction: rtl;
+  font-size: 1.2rem;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #000;
+  font-weight: 900;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 30px rgba(0, 255, 166, 0.1);
+}
+
+.btn-primary:not(:disabled):hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(0, 255, 166, 0.3);
+  filter: brightness(1.1);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.input-field-new {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 4px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2.5rem;
+  padding: 1.5rem 2.5rem;
+  color: white;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.input-field-new:focus {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(0, 255, 166, 0.4);
+  box-shadow: 0 0 50px rgba(0, 255, 166, 0.05);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 3s ease-in-out infinite;
+}
