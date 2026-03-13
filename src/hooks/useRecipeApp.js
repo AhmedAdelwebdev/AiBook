@@ -167,10 +167,17 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let buffer = '';
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        decoder.decode(value).split('\n').filter(Boolean).forEach(line => {
+        
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // Keep the last partial line in buffer
+
+        lines.filter(Boolean).forEach(line => {
           try {
             const data = JSON.parse(line);
             if (data.error) throw new Error(data.error);
@@ -182,17 +189,24 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
               if (!isAutoPilot) setInputText('');
               setProgress(100);
             }
-          } catch (e) { console.error("Stream parse error", e); }
+          } catch (e) { 
+            if (e.message !== "Auth Failure") console.error("Stream parse error", e); 
+            else throw e; // Re-throw auth failure to be caught by outer catch
+          }
         });
       }
     } catch (error) {
-       const isAuthError = error.message.toLowerCase().includes('authentication') || error.message.toLowerCase().includes('credential');
+       const isAuthError = 
+         error.message.toLowerCase().includes('authentication') || 
+         error.message.toLowerCase().includes('credential') || 
+         error.message.toLowerCase().includes('auth failure');
+         
       if (isAuthError) {
         setGoogleAccessToken('');
         localStorage.removeItem('google_access_token');
         setIsAutoPilot(false);
       }
-      setErrorModal({ open: true, message: error.message });
+      setErrorModal({ open: true, message: error.message === "Auth Failure" ? "انتهت صلاحية الجلسة، يرجى إعادة ربط حساب جوجل" : error.message });
     } finally {
       setIsProcessing(false);
       setStatusMessage('');

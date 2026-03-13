@@ -18,27 +18,8 @@ export async function appendToSheet(googleAuth, data) {
   const range = `'${targetSheet}'!A:Z`;
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED`;
 
-  // Explicit mapping based on your prompt to ensure columns are always in the same order
-  // regardless of how the AI returns the JSON keys.
-  const schema = [
-    'name',
-    'ingredients',
-    'preparation_method',
-    'preparation_duration',
-    'suitable_dishes',
-    'warnings',
-    'alternatives'
-  ];
-
-  // Map data to the schema. If a key is missing from AI, it becomes an empty string.
-  const mappedValues = schema.map(key => sanitize(data[key] || ''));
-
-  // Logic for any EXTRAs: If the user adds fields to the prompt that aren't in the schema, 
-  // we append them at the end so no data is lost.
-  const extraKeys = Object.keys(data).filter(key => !schema.includes(key));
-  extraKeys.forEach(key => {
-    mappedValues.push(sanitize(data[key]));
-  });
+  // Dynamically map all values from the data object, ignoring any keys
+  const mappedValues = Object.values(data).map(val => sanitize(val));
 
   const response = await fetch(url, {
     method: 'POST',

@@ -6,35 +6,45 @@ export default function Modals({
   showSettings, setShowSettings,
   settings, setSettings,
   onSaveSettings,
-  showToast
+  showToast,
+  onSignOut
 }) {
   return (
     <>
       {/* نافذة النجاح - تصميم عرضي مطور */}
       {resultModal.open && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-3xl p-3 md:p-6 overflow-hidden">
-          <div className="relative w-full max-w-5xl bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 animate-slide-up shadow-[0_0_80px_rgba(0,255,166,0.1)] flex flex-col md:flex-row overflow-hidden max-h-[90vh]">
-            <div className="p-6 md:p-10 flex flex-col items-center justify-center bg-gradient-to-b from-white/[0.03] to-transparent md:w-[30%] border-b md:border-b-0 md:border-l border-white/5">
-              <div className="w-20 h-20 md:w-28 md:h-28 bg-[#00ffa6]/20 rounded-full flex items-center justify-center text-5xl md:text-7xl mb-6 shadow-[0_0_50px_rgba(0,255,166,0.2)] animate-bounce-slow">✨</div>
-              <h2 className="text-3xl md:text-4xl font-black text-white text-center leading-tight">مهمة ناجحة</h2>
-              <div className="mt-4 px-4 py-2 bg-[#00ffa6] text-black rounded-full font-black text-sm">اكتملت المعالجة</div>
-            </div>
-            <div className="p-6 md:p-10 flex flex-col flex-grow overflow-hidden">
-              <div className="mb-6">
-                <p className="text-white/80 text-2xl md:text-3xl font-medium leading-normal">
-                  لقد استخرجت <span className="text-[#00ffa6] font-black underline decoration-4 underline-offset-8">{resultModal.count} وصفة</span> ذكية.
-                </p>
-                <p className="text-white/30 text-lg mt-2 font-medium">تم النشر بنجاح في جدول البيانات الخاص بك.</p>
+        <div 
+          className="fixed inset-0 z-[200] overflow-y-auto bg-black/90 backdrop-blur-3xl"
+          onClick={(e) => { if (e.target === e.currentTarget) setResultModal({ ...resultModal, open: false }) }}
+        >
+          <div 
+            className="flex min-h-full items-center justify-center p-4 sm:p-6"
+            onClick={(e) => { if (e.target === e.currentTarget) setResultModal({ ...resultModal, open: false }) }}
+          >
+            <div className="relative w-full max-w-5xl bg-[#0a0a0a] rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 animate-slide-up shadow-[0_0_80px_rgba(0,255,166,0.1)] flex flex-col md:flex-row overflow-hidden">
+              <div className="p-6 md:p-10 flex flex-col items-center justify-center bg-gradient-to-b from-white/[0.03] to-transparent shrink-0 md:w-[30%] border-b md:border-b-0 md:border-l border-white/5">
+                <div className="w-16 h-16 md:w-28 md:h-28 bg-[#00ffa6]/20 rounded-full flex items-center justify-center text-4xl md:text-7xl mb-4 md:mb-6 shadow-[0_0_50px_rgba(0,255,166,0.2)] animate-bounce-slow">✨</div>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-white text-center leading-tight">مهمة ناجحة</h2>
+                <div className="mt-3 md:mt-4 px-3 py-1.5 md:px-4 md:py-2 bg-[#00ffa6] text-black rounded-full font-black text-xs md:text-sm">اكتملت المعالجة</div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto mb-8 pr-2 custom-scrollbar flex-grow">
-                {resultModal.details.map((name, i) => (
-                  <div key={i} className="flex items-center gap-4 p-5 glass rounded-[1.5rem] border border-white/5 group hover:border-[#00ffa6]/40 transition-all bg-white/[0.01]">
-                    <div className="w-3 h-3 rounded-full bg-[#00ffa6] shadow-[0_0_10px_rgba(0,255,166,0.5)]" />
-                    <span className="text-xl font-bold truncate text-white/90">{name}</span>
-                  </div>
-                ))}
+              <div className="p-5 md:p-10 flex flex-col flex-1">
+                <div className="mb-4 md:mb-6 shrink-0">
+                  <p className="text-white/80 text-lg sm:text-2xl lg:text-3xl font-medium leading-normal">
+                    لقد استخرجت <span className="text-[#00ffa6] font-black underline decoration-2 sm:decoration-4 underline-offset-4 sm:underline-offset-8">{resultModal.count} وصفة</span> ذكية.
+                  </p>
+                  <p className="text-white/30 text-xs sm:text-lg mt-1 sm:mt-2 font-medium">تم النشر بنجاح في جدول البيانات الخاص بك.</p>
+                </div>
+                {/* تم تعديل التمرير التلقائي ووضع حد أقصى للحماية من التمدد اللانهائي */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 overflow-y-auto custom-scrollbar max-h-[40vh] mb-5 md:mb-8 pr-1 md:pr-2">
+                  {resultModal.details.map((name, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 sm:p-5 glass rounded-xl sm:rounded-[1.5rem] border border-white/5 group hover:border-[#00ffa6]/40 transition-all bg-white/[0.01]">
+                      <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-[#00ffa6] shrink-0 shadow-[0_0_10px_rgba(0,255,166,0.5)]" />
+                      <span className="text-sm sm:text-xl font-bold truncate text-white/90">{name}</span>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setResultModal({ ...resultModal, open: false })} className="w-full mt-auto shrink-0 py-3 sm:py-6 btn-primary rounded-xl sm:rounded-[1.5rem] text-lg sm:text-2xl font-black shadow-2xl transition-all active:scale-95">العودة للوحة التحكم</button>
               </div>
-              <button onClick={() => setResultModal({ ...resultModal, open: false })} className="w-full py-6 btn-primary rounded-[1.5rem] text-2xl font-black shadow-2xl transition-all active:scale-95">العودة للوحة التحكم</button>
             </div>
           </div>
         </div>
@@ -42,32 +52,49 @@ export default function Modals({
 
       {/* نافذة الخطأ */}
       {errorModal.open && (
-        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/95 backdrop-blur-3xl">
-          <div className="w-full max-w-xl bg-[#0a0a0a] rounded-[3rem] p-8 border border-red-500/20 text-center animate-slide-up shadow-2xl">
-            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-5xl mx-auto mb-6">🛑</div>
-            <h2 className="text-4xl font-black text-white mb-4">فشل في المحرك</h2>
-            <div className="bg-red-500/5 p-6 rounded-2xl text-red-400 text-xl font-mono text-center mb-8 border border-red-500/10 max-h-48 overflow-auto leading-relaxed">
-              {errorModal.message}
+        <div 
+          className="fixed inset-0 z-[250] overflow-y-auto bg-black/95 backdrop-blur-3xl"
+          onClick={(e) => { if (e.target === e.currentTarget) setErrorModal({ open: false, message: '' }) }}
+        >
+          <div 
+             className="flex min-h-full items-center justify-center p-4"
+             onClick={(e) => { if (e.target === e.currentTarget) setErrorModal({ open: false, message: '' }) }}
+          >
+            <div className="w-full max-w-xl bg-[#0a0a0a] rounded-[3rem] p-8 border border-red-500/20 text-center animate-slide-up shadow-2xl">
+              <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-5xl mx-auto mb-6">🛑</div>
+              <h2 className="text-4xl font-black text-white mb-4">فشل في المحرك</h2>
+              <div className="bg-red-500/5 p-4 sm:p-6 rounded-2xl text-red-400 text-sm sm:text-xl font-mono text-center mb-8 border border-red-500/10 max-h-48 overflow-y-auto leading-relaxed custom-scrollbar">
+                {errorModal.message}
+              </div>
+              <button onClick={() => setErrorModal({ open: false, message: '' })} className="w-full py-4 sm:py-6 bg-white/5 hover:bg-red-500/20 hover:text-red-500 rounded-2xl font-black text-xl sm:text-2xl transition-all">فهمت المشكلة</button>
             </div>
-            <button onClick={() => setErrorModal({ open: false, message: '' })} className="w-full py-6 bg-white/5 hover:bg-red-500/20 hover:text-red-500 rounded-2xl font-black text-2xl transition-all">فهمت المشكلة</button>
           </div>
         </div>
       )}
 
-      {/* لوحة الإعدادات الاحترافية - بناءً على تعديل المستخدم الأخير */}
+      {/* لوحة الإعدادات الاحترافية */}
       {showSettings && (
-        <div className="fixed inset-0 z-[150] bg-black/90 backdrop-blur-xl overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-[150] bg-black/90 backdrop-blur-xl flex flex-col"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowSettings(false) }}
+        >
           <div className="shrink-0 w-full max-w-7xl mx-auto border-b border-white/8 bg-black/40 backdrop-blur-lg">
-            <div className="px-5 sm:px-8 lg:px-12 py-5 flex items-center justify-between">
+            <div className="px-5 sm:px-8 lg:px-12 py-3 flex items-center justify-between">
               <div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">إعدادات المحرك</h2>
-                <div className="mt-2 h-1.5 w-20 bg-[#00ffa6] rounded-full shadow-glow" />
+                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight whitespace-nowrap">إعدادات المحرك</h2>
+                <div className="mt-2 h-1 w-16 bg-[#00ffa6] rounded-full shadow-glow" />
               </div>
-              <button onClick={() => setShowSettings(false)} className="w-14 h-14 rounded-2xl bg-white/5 hover:bg-red-600/70 text-white text-xl font-bold transition-colors shadow-md">✕</button>
+              <div className="flex items-center gap-2">
+                <button onClick={onSignOut} className="text-sm font-bold opacity-60 hover:text-red-500 duration-200 mx-4">تسجيل الخروج</button>
+                
+                <button onClick={() => setShowSettings(false)} className="w-14 h-14 rounded-2xl bg-white/5 hover:bg-red-600/70 text-white text-xl font-bold transition-colors shadow-md">✕</button>
+              </div>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div 
+             className="flex-1 overflow-y-auto"
+             onClick={(e) => { if (e.target === e.currentTarget) setShowSettings(false) }}
+          >
             <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-8 lg:py-12">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-12 lg:mb-16">
                 <button onClick={() => { navigator.clipboard.writeText(JSON.stringify(settings, null, 2)); showToast("تم نسخ الإعدادات"); }} className="py-6 px-8 bg-white/6 hover:bg-white/12 rounded-2xl text-lg font-semibold tracking-wide border border-white/10 transition-all shadow-sm">نسخ الإعدادات الحالية</button>
@@ -124,9 +151,10 @@ export default function Modals({
             </div>
           </div>
 
+          {/* Fixed Bottom Action Bar */}
           <div className="shrink-0 border-t border-white/8 bg-black/60 backdrop-blur-lg">
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-6">
-              <button onClick={onSaveSettings} className="w-full py-6 text-2xl font-black rounded-2xl bg-gradient-to-r from-[#00ffa6] to-[#00cc88] hover:from-[#00e695] hover:to-[#00b377] text-black shadow-xl hover:shadow-2xl transition-all duration-200 active:scale-[0.98]">حفظ التغييرات</button>
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-4">
+              <button onClick={onSaveSettings} className="w-full py-4 text-2xl font-black rounded-2xl bg-gradient-to-r from-[#00ffa6] to-[#00cc88] hover:from-[#00e695] hover:to-[#00b377] text-black shadow-xl hover:shadow-2xl transition-all duration-200 active:scale-[0.98]">حفظ التغييرات</button>
             </div>
           </div>
         </div>

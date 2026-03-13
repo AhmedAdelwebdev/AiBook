@@ -1,8 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Recipe → Sheet AI",
-  description: "Extract recipe data using AI and export to Google Sheets",
+  title: "AiBookk"
 };
 
 export default function RootLayout({ children }) {
