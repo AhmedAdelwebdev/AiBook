@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { appendToSheet } from '@/lib/sheets';
 
 export function useRecipeApp() {
   const [inputText, setInputText] = useState('');
@@ -20,9 +21,7 @@ export function useRecipeApp() {
   const [selectedSheetName, setSelectedSheetName] = useState('Sheet1');
   const [isLoadingSheets, setIsLoadingSheets] = useState(false);
 
-  const [isAutoPilot, setIsAutoPilot] = useState(false);
-  const [lastUpdateId, setLastUpdateId] = useState(0);
-  const autoPilotTimer = useRef(null);
+  const [directInputText, setDirectInputText] = useState('');
 
   const [settings, setSettings] = useState({
     GROQ_API_KEY: '',
@@ -51,9 +50,7 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
 3. اسم الوصفة: العنوان الرئيسي (لا تتركه فارغاً).
 4. preparation_method: وصف الخطوات في جملة واحدة متصلة وسلسة.
 5. preparation_duration: "XX دقيقة" أو "XX إلى YY دقيقة" (إذا نطاق اختر الأعلى).
-6. أخرج JSON فقط بدون أي نص إضافي أو شرح.`,
-    TG_BOT_TOKEN: '',
-    TG_CHAT_ID: ''
+6. أخرج JSON فقط بدون أي نص إضافي أو شرح.`
   });
 
   useEffect(() => {
@@ -64,7 +61,6 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
     setSelectedSheetId(localStorage.getItem('selected_sheet_id') || '');
     setSelectedSheetName(localStorage.getItem('selected_sheet_name') || 'Sheet1');
     setGoogleAccessToken(localStorage.getItem('google_access_token') || '');
-    setLastUpdateId(Number(localStorage.getItem('tg_last_update_id')) || 0);
 
     const hashToken = new URLSearchParams(window.location.hash.substring(1)).get('access_token');
     if (hashToken) {
@@ -76,55 +72,6 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
 
   useEffect(() => { if (googleAccessToken) fetchSpreadsheets(); }, [googleAccessToken]);
 
-  useEffect(() => {
-    const initAutoPilot = async () => {
-      if (isAutoPilot && mounted && !isProcessing) {
-        try {
-          const res = await fetch(`https://api.telegram.org/bot${settings.TG_BOT_TOKEN}/getUpdates?limit=1&offset=-1`);
-          const data = await res.json();
-          if (data.ok && data.result.length > 0) {
-            const currentMax = data.result[0].update_id;
-            setLastUpdateId(currentMax);
-            localStorage.setItem('tg_last_update_id', currentMax);
-          }
-        } catch (e) { console.error("Baseline error", e); }
-        autoPilotTimer.current = setInterval(checkTelegramUpdates, 10000);
-      } else {
-        clearInterval(autoPilotTimer.current);
-      }
-    };
-    initAutoPilot();
-    return () => clearInterval(autoPilotTimer.current);
-  }, [isAutoPilot, isProcessing, mounted]);
-
-  const checkTelegramUpdates = async () => {
-    if (!settings.TG_BOT_TOKEN || isProcessing) return;
-    try {
-      const offset = lastUpdateId + 1;
-      const res = await fetch(`https://api.telegram.org/bot${settings.TG_BOT_TOKEN}/getUpdates?offset=${offset}&limit=5`);
-      const data = await res.json();
-      if (data.ok && data.result.length > 0) {
-        const latestUpdate = data.result[data.result.length - 1];
-        const newUpdateId = latestUpdate.update_id;
-        const validUpdates = settings.TG_CHAT_ID 
-          ? data.result.filter(u => u.message && String(u.message.chat.id) === String(settings.TG_CHAT_ID))
-          : data.result.filter(u => u.message);
-
-        if (validUpdates.length > 0) {
-          const latestValid = validUpdates[validUpdates.length - 1];
-          const text = latestValid.message.text;
-          if (text) {
-            setLastUpdateId(newUpdateId);
-            localStorage.setItem('tg_last_update_id', newUpdateId);
-            startProcessing(text);
-          }
-        } else {
-          setLastUpdateId(newUpdateId);
-          localStorage.setItem('tg_last_update_id', newUpdateId);
-        }
-      }
-    } catch (e) { console.error("Auto-Pilot Error:", e); }
-  };
 
   const fetchSpreadsheets = async () => {
     if (!googleAccessToken) return;
@@ -139,6 +86,25 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
     } catch (e) { } finally { setIsLoadingSheets(false); }
   };
 
+  const splitRecipes = (text, kw, regexStr, customCode) => {
+    const tContent = text.trim();
+    if (customCode) {
+      try {
+        const dynamicSplitter = new Function('text', customCode);
+        const result = dynamicSplitter(tContent);
+        if (Array.isArray(result)) return result.map(t => t.trim()).filter(t => t.length > 5);
+      } catch (e) { console.error("Dynamic Split Error:", e); }
+    }
+    if (regexStr) {
+      try {
+        const regex = new RegExp(regexStr, 'g');
+        return tContent.split(regex).map(t => t.trim()).filter(t => t.length > 5);
+      } catch (e) {}
+    }
+    if (!kw || !tContent.includes(kw)) return [tContent];
+    return tContent.split(kw).map(t => t.trim()).filter(t => t.length > 5);
+  };
+
   const startProcessing = async (textToProcess) => {
     const finalSelection = textToProcess || inputText;
     if (!finalSelection.trim()) return showToast("لا يوجد نص للمعالجة");
@@ -149,70 +115,125 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
     const list = [];
 
     try {
-      const response = await fetch('/api/process', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: finalSelection,
-          settings,
-          googleAuth: {
-            accessToken: googleAccessToken,
-            spreadsheetId: selectedSheetId,
-            sheetName: selectedSheetName
-          }
-        })
-      });
+      const recipes = splitRecipes(finalSelection, settings.SPLIT_KEYWORD, settings.SPLIT_REGEX, settings.SPLIT_CODE);
+      const total = recipes.length;
+      if (total === 0) throw new Error("لم يتم العثور على وصفات صالحة بعد التقسيم.");
 
-      if (!response.body) throw new Error("فشل الاتصال بالخادم");
+      setStatusMessage(`تم العثور على ${total} وصفة. جاري المعالجة...`);
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      for (let i = 0; i < total; i++) {
+        let retryCount = 0;
+        let success = false;
         
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop(); // Keep the last partial line in buffer
-
-        lines.filter(Boolean).forEach(line => {
+        while (!success && retryCount < 3) {
           try {
-            const data = JSON.parse(line);
-            if (data.error) throw new Error(data.error);
-            if (data.status) setStatusMessage(data.status);
-            if (data.progress !== null && data.progress !== undefined) setProgress(data.progress);
-            if (data.recipe) list.push(data.recipe);
-            if (data.done) {
-              setResultModal({ open: true, count: data.count, details: list });
-              if (!isAutoPilot) setInputText('');
-              setProgress(100);
+            const currentPercent = Math.round((i / total) * 100);
+            setStatusMessage(`جاري معالجة ${i + 1} من ${total}`);
+            setProgress(currentPercent);
+
+            const res = await fetch('/api/process', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                text: recipes[i],
+                settings,
+                googleAuth: { accessToken: googleAccessToken, spreadsheetId: selectedSheetId, sheetName: selectedSheetName }
+              })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+              if (res.status === 401) throw new Error("Auth Failure");
+              if (res.status === 429) throw new Error("Rate Limit");
+              throw new Error(data.error || "خطأ في المعالجة");
             }
-          } catch (e) { 
-            if (e.message !== "Auth Failure") console.error("Stream parse error", e); 
-            else throw e; // Re-throw auth failure to be caught by outer catch
+
+            list.push(data.recipe);
+            success = true;
+            
+            // Add minimum delay to avoid rate limits
+            if (i < total - 1) await new Promise(r => setTimeout(r, 2000));
+            
+          } catch (err) {
+            retryCount++;
+            if (err.message === "Auth Failure") throw err;
+
+            if (err.message === "Rate Limit") {
+              setStatusMessage(`تم تجاوز حد الطلبات. جاري الانتظار دقيقة...`);
+              await new Promise(r => setTimeout(r, 60000));
+            } else {
+              setStatusMessage(`فشل في رقم ${i+1}. إعادة المحاولة (${retryCount}/3)...`);
+              await new Promise(r => setTimeout(r, 5000));
+            }
           }
-        });
+        }
+        
+        if (!success) {
+          showToast(`تم تخطي وصفة ${i+1} لفشلها المتكرر.`);
+        }
       }
+
+      setResultModal({ open: true, count: list.length, details: list.map(r => r.name || 'وصفة') });
+      setInputText('');
+      setProgress(100);
+
     } catch (error) {
-       const isAuthError = 
-         error.message.toLowerCase().includes('authentication') || 
-         error.message.toLowerCase().includes('credential') || 
-         error.message.toLowerCase().includes('auth failure');
-         
-      if (isAuthError) {
+      if (error.message === "Auth Failure") {
         setGoogleAccessToken('');
         localStorage.removeItem('google_access_token');
-        setIsAutoPilot(false);
+        setErrorModal({ open: true, message: "انتهت صلاحية الجلسة، يرجى إعادة ربط حساب جوجل" });
+      } else {
+        setErrorModal({ open: true, message: error.message });
       }
-      setErrorModal({ open: true, message: error.message === "Auth Failure" ? "انتهت صلاحية الجلسة، يرجى إعادة ربط حساب جوجل" : error.message });
     } finally {
       setIsProcessing(false);
       setStatusMessage('');
       setTimeout(() => setProgress(0), 1000);
     }
   };
+
+  const handlePasteAndProcess = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.trim()) return showToast("الحافظة فارغة.");
+      setInputText(text);
+      startProcessing(text);
+    } catch (e) {
+      showToast("يرجى لصق النص يدوياً قبل المعالجة.");
+    }
+  };
+
+  const handlePasteAndSendDirect = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.trim()) return showToast("الحافظة فارغة.");
+      setDirectInputText(text);
+      await sendDirectToSheet(text);
+    } catch (e) {
+      showToast("فشل اللصق، حاول اللصق يدوياً.");
+    }
+  };
+
+  const sendDirectToSheet = async (textToSend) => {
+    const finalSelection = textToSend || directInputText;
+    if (!finalSelection.trim()) return showToast("يرجى إدخال نص أولاً");
+    if (!googleAccessToken || !selectedSheetId) return showToast("يرجى ربط حساب جوجل واختيار ملف");
+
+    setIsProcessing(true);
+    setStatusMessage("جاري الإرسال للشيت مباشرة...");
+    try {
+      const googleAuth = { accessToken: googleAccessToken, spreadsheetId: selectedSheetId, sheetName: selectedSheetName };
+      await appendToSheet(googleAuth, { value: finalSelection });
+      showToast("تم إرسال النص للشيت بنجاح!");
+      setDirectInputText('');
+    } catch(err) {
+      setErrorModal({ open: true, message: `فشل الإرسال: ${err.message}` });
+    } finally {
+      setIsProcessing(false);
+      setStatusMessage('');
+    }
+  };
+
 
   const authenticateGoogle = () => {
     const scope = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly';
@@ -229,6 +250,7 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
 
   return {
     inputText, setInputText,
+    directInputText, setDirectInputText,
     isProcessing,
     progress,
     statusMessage,
@@ -241,11 +263,13 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
     spreadsheets,
     selectedSheetId, setSelectedSheetId,
     selectedSheetName, setSelectedSheetName,
-    isAutoPilot, setIsAutoPilot,
     settings, setSettings,
     startProcessing,
     authenticateGoogle,
     saveSettings,
-    showToast
+    showToast,
+    handlePasteAndProcess,
+    handlePasteAndSendDirect,
+    sendDirectToSheet
   };
 }

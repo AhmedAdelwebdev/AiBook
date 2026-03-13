@@ -1,4 +1,4 @@
-'use client';
+import { ClipboardPaste } from 'lucide-react';
 
 export default function ConnectionPanel({ 
   googleAccessToken, 
@@ -9,7 +9,8 @@ export default function ConnectionPanel({
   selectedSheetName, 
   setSelectedSheetName,
   isProcessing,
-  onProcess
+  onProcess,
+  onPasteAndProcess
 }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -47,13 +48,22 @@ export default function ConnectionPanel({
         </div>
       </div>
 
-      <div className="lg:col-span-4 flex items-center">
-         <button 
+      <div className="lg:col-span-4 flex items-center gap-4">
+        <button 
+          onClick={onPasteAndProcess}
+          disabled={isProcessing || !googleAccessToken || !selectedSheetId}
+          title="لصق ومعالجة فورية"
+          className="w-20 h-16 sm:h-20 glass rounded-2xl flex items-center justify-center text-[#00ffa6] border border-[#00ffa6]/20 hover:bg-[#00ffa6]/10 transition-all shadow-xl disabled:opacity-20"
+        >
+          <ClipboardPaste size={32} />
+        </button>       
+         
+        <button 
           onClick={onProcess} 
           disabled={isProcessing || !googleAccessToken || !selectedSheetId}
-          className={`w-full h-16 sm:h-20 btn-primary rounded-2xl text-2xl font-black disabled:opacity-20 disabled:grayscale transition-all shadow-[0_20px_60px_rgba(0,255,166,0.3)] hover:scale-[1.05] active:scale-95`}
+          className={`flex-1 h-16 sm:h-20 bg-accent/10 text-accent btn-primary rounded-2xl text-2xl font-black disabled:opacity-20 disabled:grayscale transition-all shadow-[0_20px_60px_rgba(0,255,166,0.3)] hover:scale-[1.05] active:scale-95`}
         >
-          {isProcessing ? 'جاري المعالجة...' : 'بدء المعالجة'}
+          {isProcessing ? 'جاري...' : 'بدء المعالجة'}
         </button>
       </div>
     </div>

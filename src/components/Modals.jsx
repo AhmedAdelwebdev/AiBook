@@ -116,19 +116,7 @@ export default function Modals({
                   </div>
                 </section>
 
-                <section>
-                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-6 pb-3 border-b border-[#0088cc]/20">إشعارات تليجرام</h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-10">
-                    <div className="space-y-2">
-                      <label className="block text-[#0088cc] font-medium text-lg">Bot Token</label>
-                      <input type="text" value={settings.TG_BOT_TOKEN || ''} onChange={e => setSettings(s => ({ ...s, TG_BOT_TOKEN: e.target.value }))} className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-lg focus:border-[#0088cc]/60 focus:ring-2 focus:ring-[#0088cc]/30 outline-none transition-all" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-[#0088cc] font-medium text-lg">Chat ID</label>
-                      <input type="text" value={settings.TG_CHAT_ID || ''} onChange={e => setSettings(s => ({ ...s, TG_CHAT_ID: e.target.value }))} className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-lg focus:border-[#0088cc]/60 focus:ring-2 focus:ring-[#0088cc]/30 outline-none transition-all" />
-                    </div>
-                  </div>
-                </section>
+
 
                 <section>
                   <h3 className="text-xl lg:text-2xl font-bold text-white mb-6 pb-3 border-b border-[#00ffa6]/20">منطق معالجة واستخراج الوصفات</h3>

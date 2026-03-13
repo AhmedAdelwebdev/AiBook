@@ -9,6 +9,7 @@ import { useRecipeApp } from '@/hooks/useRecipeApp';
 export default function Home() {
   const {
     inputText, setInputText,
+    directInputText, setDirectInputText,
     isProcessing,
     progress,
     statusMessage,
@@ -21,12 +22,14 @@ export default function Home() {
     spreadsheets,
     selectedSheetId, setSelectedSheetId,
     selectedSheetName, setSelectedSheetName,
-    isAutoPilot, setIsAutoPilot,
     settings, setSettings,
     startProcessing,
     authenticateGoogle,
     saveSettings,
-    showToast
+    showToast,
+    handlePasteAndProcess,
+    sendDirectToSheet,
+    handlePasteAndSendDirect
   } = useRecipeApp();
 
   if (!mounted) return null;
@@ -50,17 +53,20 @@ export default function Home() {
           setSelectedSheetName={setSelectedSheetName}
           isProcessing={isProcessing}
           onProcess={() => startProcessing()}
+          onPasteAndProcess={handlePasteAndProcess}
         />
 
         <Workspace 
           inputText={inputText}
           setInputText={setInputText}
-          isAutoPilot={isAutoPilot}
-          setIsAutoPilot={setIsAutoPilot}
+          directInputText={directInputText}
+          setDirectInputText={setDirectInputText}
           isProcessing={isProcessing}
           progress={progress}
           statusMessage={statusMessage}
           onProcess={() => startProcessing()}
+          onSendDirect={sendDirectToSheet}
+          onPasteAndSendDirect={handlePasteAndSendDirect}
         />
       </main>
 

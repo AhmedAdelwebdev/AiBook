@@ -11,7 +11,7 @@ export default function Header({ onOpenSettings }) {
       
       <div className="group cursor-default">
         <h1 className="text-2xl md:text-4xl font-black tracking-tight flex items-center gap-2">
-          <span className="pt-2 pl-1">Book</span> <span className="bg-[#00ffa6] text-black px-3 pt-2 sm:pb-2 rounded-xl shadow-lg">AI</span>
+          Book <span className="text-[#00ffa6] shadow-sm">AI</span>
         </h1>
       </div>
     </header>
