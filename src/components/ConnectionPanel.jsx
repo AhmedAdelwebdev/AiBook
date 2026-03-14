@@ -1,11 +1,11 @@
 import { Database, FileText, ChevronDown, Plus } from 'lucide-react';
 
-export default function ConnectionPanel({ 
-  googleAccessToken, 
-  selectedSheetId, 
-  setSelectedSheetId, 
-  spreadsheets, 
-  selectedSheetName, 
+export default function ConnectionPanel({
+  googleAccessToken,
+  selectedSheetId,
+  setSelectedSheetId,
+  spreadsheets,
+  selectedSheetName,
   setSelectedSheetName,
 }) {
   if (!googleAccessToken) return null;
@@ -25,45 +25,44 @@ export default function ConnectionPanel({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+    <div className="grid grid-cols-2 gap-4 w-full pt-3">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5 px-1">
-          <Database size={14} className="text-accent" />
-          <label className="text-text-primary text-sm font-bold">قاعدة البيانات</label>
+          <Database size={16} className="text-accent" />
+          <label className="text-text2 text-base font-black">قاعدة البيانات</label>
         </div>
         <div className="relative">
-          <select 
-            value={selectedSheetId} 
+          <select value={selectedSheetId}
             onChange={e => { setSelectedSheetId(e.target.value); localStorage.setItem('selected_sheet_id', e.target.value); }}
-            className="w-full h-11 bg-bg-input border border-border rounded-xl px-4 outline-none text-text-primary text-sm font-bold appearance-none cursor-pointer focus:border-accent transition-all"
+            className="w-full h-14 bg-input border border-border rounded-xl px-4 outline-none text-text2 text-base md:text-lg font-bold appearance-none cursor-pointer focus:border-accent transition-all"
           >
-            <option value="" className="bg-bg-main">اختر قاعدة البيانات</option>
-            {spreadsheets.map(f => <option key={f.id} value={f.id} className="bg-bg-main">{f.name}</option>)}
+            <option value="" className="bg-body">اختر قاعدة البيانات</option>
+            {spreadsheets.map(f => <option key={f.id} value={f.id} className="bg-body">{f.name}</option>)}
           </select>
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none">
-            <ChevronDown size={16} />
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text2 pointer-events-none">
+            <ChevronDown size={20} />
           </div>
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5 px-1">
-          <FileText size={14} className="text-accent" />
-          <label className="text-text-primary text-sm font-bold">ورقة العمل</label>
+          <FileText size={16} className="text-accent" />
+          <label className="text-text2 text-base font-black">ورقة العمل</label>
         </div>
         <div className="flex gap-2">
-          <input 
-            value={selectedSheetName} 
+          <input
+            value={selectedSheetName}
             onChange={e => { setSelectedSheetName(e.target.value); localStorage.setItem('selected_sheet_name', e.target.value); }}
-            className="flex-1 h-11 bg-bg-input border border-border rounded-xl px-4 outline-none text-text-primary text-sm font-bold focus:border-accent transition-all text-right"
+            className="flex-1 w-full h-14 bg-input border border-border rounded-xl px-4 outline-none text-text2 text-base md:text-lg font-bold focus:border-accent transition-all text-right"
             placeholder="مثلاً: Sheet1"
           />
           <button
             onClick={incrementSheetName}
             title="زيادة الرقم بمقدار 1"
-            className="h-11 w-11 flex-shrink-0 bg-bg-input border border-border rounded-xl flex items-center justify-center text-accent hover:bg-accent hover:text-bg-main hover:border-accent transition-all"
+            className="h-14 w-14 flex-shrink-0 bg-accent/10 border border-accent/20 rounded-xl flex items-center justify-center text-accent hover:bg-accent hover:text-body transition-all active:scale-95"
           >
-            <Plus size={18} />
+            <Plus size={24} />
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { appendToSheet } from '@/lib/sheets';
+import { appendToSheet, getSheetStats } from '@/lib/sheets';
 
 export function useRecipeApp() {
   const [inputText, setInputText] = useState('');
@@ -12,7 +12,7 @@ export function useRecipeApp() {
   const [toast, setToast] = useState({ show: false, message: '' });
   const [mounted, setMounted] = useState(false);
   
-  const [resultModal, setResultModal] = useState({ open: false, count: 0, details: [] });
+  const [resultModal, setResultModal] = useState({ open: false, count: 0, details: [], totalRows: 0 });
   const [errorModal, setErrorModal] = useState({ open: false, message: '' });
 
   const [googleAccessToken, setGoogleAccessToken] = useState('');
@@ -144,14 +144,20 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
             const data = await res.json();
             if (!res.ok) {
               if (res.status === 401) throw new Error("Auth Failure");
-              if (res.status === 429) throw new Error("Rate Limit");
+              if (res.status === 429) {
+                // If rate limited, wait longer then retry
+                setStatusMessage(`جاري تجنب حد الطلبات... (محاولة ${retryCount + 1})`);
+                await new Promise(r => setTimeout(r, 10000));
+                retryCount++;
+                continue;
+              }
               throw new Error(data.error || "خطأ في المعالجة");
             }
 
             list.push(data.recipe);
             success = true;
             
-            // Add minimum delay to avoid rate limits
+            // Reduced delay to 2 seconds for faster processing if not limited
             if (i < total - 1) await new Promise(r => setTimeout(r, 3000));
             
           } catch (err) {
@@ -173,10 +179,23 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
         }
       }
 
-      setResultModal({ open: true, count: list.length, details: list.map(r => r.name || 'وصفة') });
-      setInputText('');
+      // 1. Fetch updated sheet stats
+      const totalInSheet = await getSheetStats({ accessToken: googleAccessToken, spreadsheetId: selectedSheetId, sheetName: selectedSheetName });
+      
+      // 2. Set progress to 100 first
       setProgress(100);
+      
+      // 2. Wait for the CSS transition (0.8s) to complete
+      await new Promise(r => setTimeout(r, 1000));
 
+      // 3. Now show the modal
+      setResultModal({ 
+        open: true, 
+        count: list.length, 
+        details: list.map(r => r.name || 'وصفة'),
+        totalRows: Math.max(0, totalInSheet - 1)
+      });
+      setInputText('');
     } catch (error) {
       if (error.message === "Auth Failure") {
         setGoogleAccessToken('');
@@ -188,7 +207,7 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
     } finally {
       setIsProcessing(false);
       setStatusMessage('');
-      setTimeout(() => setProgress(0), 1000);
+      setTimeout(() => setProgress(0), 500);
     }
   };
 
@@ -211,7 +230,7 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
       
       const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
       if (wordCount < 10) {
-        return showToast(`النص قصير جداً (${wordCount} كلمات). الحد الأدنى 10 كلمات.`);
+        return showToast(`النص قصير جداً (${wordCount} كلمات)`);
       }
       
       setInputText(text);
@@ -227,17 +246,25 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
     if (!googleAccessToken || !selectedSheetId) return showToast("يرجى ربط حساب جوجل واختيار ملف");
 
     setIsProcessing(true);
+    setProgress(0);
     setStatusMessage("جاري الإرسال للشيت...");
     try {
       const googleAuth = { accessToken: googleAccessToken, spreadsheetId: selectedSheetId, sheetName: selectedSheetName };
 
-      // إذا احتوى النص على فاصلة → قسّمه على أعمدة
       const parts = textToSend.split(',').map(p => p.trim()).filter(p => p.length > 0);
       const data = parts.length > 1
         ? Object.fromEntries(parts.map((v, i) => [i, v]))
         : { value: textToSend };
 
       await appendToSheet(googleAuth, data);
+      
+      // Complete progress smoothly
+      setProgress(100);
+      setStatusMessage("تم الحفظ بنجاح ✓");
+      
+      // Wait for animation
+      await new Promise(r => setTimeout(r, 1000));
+      
       showToast(parts.length > 1 ? `تم الإرسال في ${parts.length} أعمدة ✓` : "تم الإرسال للشيت ✓");
       setInputText('');
     } catch(err) {
@@ -245,15 +272,16 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
     } finally {
       setIsProcessing(false);
       setStatusMessage('');
+      setTimeout(() => setProgress(0), 500);
     }
   };
 
 
   const authenticateGoogle = () => {
     const scope = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly';
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${settings.GOOGLE_CLIENT_ID}&redirect_uri=${window.location.origin}&response_type=token&scope=${scope}`;
+    // Adding prompt=consent to help get fresh tokens, though true persistence needs server-side exchange
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${settings.GOOGLE_CLIENT_ID}&redirect_uri=${window.location.origin}&response_type=token&scope=${scope}&prompt=consent`;
   };
-
   const showToast = (m) => { setToast({ show: true, message: m }); setTimeout(() => setToast({ show: false, message: '' }), 3000); };
 
   const saveSettings = () => {

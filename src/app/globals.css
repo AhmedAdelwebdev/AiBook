@@ -1,15 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg-main: #050505;
-  --color-bg-card: #0d1117;
-  --color-bg-input: #161b22;
-  --color-accent: #3be;
-  --color-accent-2: #1d82ae;
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #a3a3a3;
-  --color-text-dim: #525252;
-  --color-border: #21262b;
+  --color-body: #0f1115;
+  --color-card: #181d29;
+  --color-input: #1c202c;
+  --color-accent: #38bdf8;
+  --color-text1: #e0e6f0;
+  --color-text2: #9aa5b1;
+  --color-text3: #525c6b;
+  --color-border: #2a3245;
   --color-error: #ef4444;
 }
 
@@ -20,13 +19,37 @@
   font-style: normal;
 }
 
-::-webkit-scrollbar {
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Global scrollbar hide if preferred */
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth Progress Circle Animation */
+circle {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
 body {
-  background-color: var(--color-bg-main);
-  color: var(--color-text-primary);
+  background-color: var(--color-body);
+  color: var(--color-text1);
   font-family: 'Tajawal', sans-serif;
   min-height: 100vh;
   margin: 0;
@@ -83,8 +106,15 @@ body {
 }
 
 @keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .animate-slide-up {
@@ -92,8 +122,15 @@ body {
 }
 
 @keyframes bounceSlow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-bounce-slow {

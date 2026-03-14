@@ -68,3 +68,22 @@ export async function appendToSheet(googleAuth, data) {
   
   return resData;
 }
+
+/**
+ * Gets the total number of rows in a sheet.
+ */
+export async function getSheetStats(googleAuth) {
+  const { accessToken, spreadsheetId, sheetName } = googleAuth;
+  const targetSheet = sheetName || 'Sheet1';
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(targetSheet)}!A:A`;
+  
+  const response = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${accessToken}` }
+  });
+  const data = await response.json();
+  
+  if (data.values) {
+    return data.values.length;
+  }
+  return 0;
+}
