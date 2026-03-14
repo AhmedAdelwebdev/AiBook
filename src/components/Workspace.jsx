@@ -18,23 +18,23 @@ export default function Workspace({
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Input area */}
-      <div className="relative bg-bg-card rounded-2xl overflow-hidden focus-within:border-accent transition-all">
+      <div className="relative bg-bg-card border border-border rounded-2xl overflow-hidden focus-within:border-accent transition-all">
         <textarea 
           value={inputText} 
           onChange={e => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="اكتب القسم الجديد هنا..."
-          className="w-full h-[25vh] md:h-[40vh] border border-border resize-none px-4 pt-4 pb-20 md:pb-24 text-base md:text-lg outline-none placeholder:text-text-dim text-text-primary bg-transparent leading-relaxed text-right"
+          className="w-full h-[25vh] md:h-[40vh] resize-none px-4 pt-4 pb-20 md:pb-24 text-base md:text-lg outline-none placeholder:text-text-dim text-text-primary bg-transparent leading-relaxed text-right"
           dir="rtl"
           disabled={isProcessing}
         />
 
         {/* Send button inside textarea */}
-        <div className="absolute bottom-4 right-4">
+        <div className="absolute bottom-4 right-4 border border-border">
           <button 
             onClick={() => onSendDirect()}
             disabled={!inputText.trim() || isProcessing}
-            className="bg-accent-2 text-bg-main border border-border px-5 py-2.5 md:px-6 md:py-3 rounded-xl flex items-center gap-2 font-black text-sm md:text-base shadow-lg transition-all hover:brightness-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="bg-accent-2 text-bg-main px-5 py-2.5 md:px-6 md:py-3 rounded-xl flex items-center gap-2 font-black text-sm md:text-base shadow-lg transition-all hover:brightness-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <span>إرسال</span>
             <ChevronLeft size={20} />
