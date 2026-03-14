@@ -14,7 +14,7 @@ export default function Header({
         {/* Auth */}
         <div className="flex items-center gap-2">
           {!googleAccessToken ? (
-            <button onClick={onAuthenticate} className="bg-accent/10 text-accent p-3 md:px-4 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all font-bold text-sm shadow">
+            <button onClick={onAuthenticate} className="bg-accent/10 text-accent p-4 md:px-4 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all font-bold text-sm shadow">
               <User size={20} />
               <span className="hidden sm:block">تسجيل الدخول</span>
             </button>
@@ -22,7 +22,7 @@ export default function Header({
             <div className="flex items-center gap-2">
               <button 
                 onClick={onSignOut} title="تسجيل الخروج"
-                className="p-2 text-error bg-error/10 border border-error/20 rounded-xl hover:bg-error hover:text-white transition-all"
+                className="p-3 text-error bg-error/10 rounded-xl hover:bg-error hover:text-white transition-all"
               >
                 <LogOut size={18} />
               </button>

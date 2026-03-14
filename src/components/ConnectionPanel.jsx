@@ -35,7 +35,7 @@ export default function ConnectionPanel({
           <select 
             value={selectedSheetId} 
             onChange={e => { setSelectedSheetId(e.target.value); localStorage.setItem('selected_sheet_id', e.target.value); }}
-            className="w-full h-11 bg-bg-input border border-border rounded-xl px-4 pr-9 outline-none text-text-primary text-sm font-bold appearance-none cursor-pointer focus:border-accent transition-all"
+            className="w-full h-11 bg-bg-input border border-border rounded-xl px-4 outline-none text-text-primary text-sm font-bold appearance-none cursor-pointer focus:border-accent transition-all"
           >
             <option value="" className="bg-bg-main">اختر قاعدة البيانات</option>
             {spreadsheets.map(f => <option key={f.id} value={f.id} className="bg-bg-main">{f.name}</option>)}
