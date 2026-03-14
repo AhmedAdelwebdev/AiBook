@@ -160,7 +160,7 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
 
             if (err.message === "Rate Limit") {
               setStatusMessage(`تم تجاوز حد الطلبات. جاري الانتظار دقيقة...`);
-              await new Promise(r => setTimeout(r, 60000));
+              await new Promise(r => setTimeout(r, 10000));
             } else {
               setStatusMessage(`فشل في رقم ${i+1}. إعادة المحاولة (${retryCount}/3)...`);
               await new Promise(r => setTimeout(r, 5000));
