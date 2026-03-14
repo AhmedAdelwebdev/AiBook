@@ -1,93 +1,79 @@
-import { Send, ClipboardPlus } from 'lucide-react';
+import { ClipboardType, Loader2, ChevronLeft } from 'lucide-react';
 
 export default function Workspace({ 
   inputText, 
   setInputText, 
-  directInputText,
-  setDirectInputText,
   isProcessing, 
-  progress,
-  statusMessage,
-  onProcess,
+  progress, 
+  statusMessage, 
   onSendDirect,
-  onPasteAndSendDirect
+  onPasteAndProcess
 }) {
   const handleKeyDown = (e) => {
-    // Only trigger processing on Enter for desktop screens (width > 768)
-    if (e.key === 'Enter' && !e.shiftKey && typeof window !== 'undefined' && window.innerWidth > 768) {
-      e.preventDefault();
-      if (inputText.trim() && !isProcessing) {
-        onProcess();
-      }
+    if (e.key === 'Enter' && e.ctrlKey) {
+      onSendDirect();
     }
   };
 
   return (
-    <div className="flex flex-col gap-8 mt-2">
-      <div className="relative group">
-        <div className="absolute -inset-2 bg-gradient-to-r from-accent/5 to-transparent blur-3xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-        
-        <div className="relative glass-dark overflow-hidden rounded-[2rem] shadow-xl border border-white/5">
-          <textarea 
-            value={inputText} 
-            onChange={e => setInputText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="الصق نص الوصفات هنا..."
-            className="w-full h-[35vh] resize-none min-h-42 p-8 md:p-10 text-xl md:text-2xl font-medium outline-none placeholder:text-white/20 focus:border-accent/10"
-            dir="rtl"
-            disabled={isProcessing}
-          />
+    <div className="flex flex-col gap-6 w-full">
+      {/* Input area */}
+      <div className="relative bg-bg-card rounded-2xl overflow-hidden focus-within:border-accent transition-all">
+        <textarea 
+          value={inputText} 
+          onChange={e => setInputText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="اكتب القسم الجديد هنا..."
+          className="w-full h-[25vh] md:h-[40vh] resize-none px-4 pt-4 pb-20 md:pb-24 text-base md:text-lg outline-none placeholder:text-text-dim text-text-primary bg-transparent leading-relaxed text-right"
+          dir="rtl"
+          disabled={isProcessing}
+        />
 
-          {isProcessing && (
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-2xl flex flex-row items-center justify-center gap-8 px-10 z-50 animate-in fade-in duration-300">
-              <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
-                <svg className="absolute inset-0 w-full h-full -rotate-90">
-                  <circle cx="48" cy="48" r="42" fill="none" stroke="currentColor" strokeWidth="6" className="text-white/5" />
-                  <circle cx="48" cy="48" r="42" fill="none" stroke="currentColor" strokeWidth="6" strokeDasharray="264" strokeDashoffset={264 - (264 * progress) / 100} className="text-accent transition-all duration-700 ease-out" strokeLinecap="round" />
-                </svg>
-                <div className="text-xl font-black text-white">{progress}%</div>
-              </div>
-              
-              <div className="flex flex-col text-right">
-                <span className="text-accent font-black text-lg mb-1 animate-pulse">
-                  {statusMessage || 'جاري المعالجة...'}
-                </span>
-                <p className="text-white/30 text-sm font-medium">
-                  يرجى الانتظار، يتم تنظيم البيانات الآن.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Direct Send Section */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
-        <div className="md:col-span-9 glass rounded-[1.5rem] p-1.5 flex items-center gap-2 border border-white/5 shadow-lg group focus-within:border-[#00ffa6]/30 transition-all">
-          <input 
-            type="text" 
-            value={directInputText}
-            onChange={e => setDirectInputText(e.target.value)}
-            placeholder="أدخل نصاً للإرسال المباشر (أول عمود فقط)..."
-            className="flex-1 bg-transparent px-6 py-4 outline-none text-white text-lg font-medium"
-            dir="rtl"
-          />
+        {/* Send button inside textarea */}
+        <div className="absolute bottom-4 right-4">
           <button 
-            onClick={onPasteAndSendDirect}
-            className="p-4 hover:bg-[#00ffa6]/10 rounded-2xl text-[#00ffa6] transition-all group-hover:scale-110 active:scale-90"
-            title="لصق وإرسال فوري"
+            onClick={() => onSendDirect()}
+            disabled={!inputText.trim() || isProcessing}
+            className="bg-accent-2 text-bg-main px-5 py-2.5 md:px-6 md:py-3 rounded-xl flex items-center gap-2 font-black text-sm md:text-base shadow-lg transition-all hover:brightness-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            <ClipboardPlus size={28} />
+            <span>إرسال</span>
+            <ChevronLeft size={20} />
           </button>
         </div>
-        
+
+
+        {/* Processing overlay */}
+        {isProcessing && (
+          <div className="absolute inset-0 bg-bg-main/95 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-50">
+            <div className="relative w-20 h-20 md:w-24 md:h-24">
+              <svg className="w-full h-full -rotate-90">
+                <circle cx="50%" cy="50%" r="45%" fill="none" stroke="currentColor" strokeWidth="3" className="text-border" />
+                <circle cx="50%" cy="50%" r="45%" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="283" strokeDashoffset={283 - (283 * progress) / 100} className="text-accent" strokeLinecap="round" />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-xl font-black text-text-primary">{progress}%</div>
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center px-4">
+              <span className="text-accent text-base font-black flex items-center gap-2">
+                <Loader2 size={16} className="animate-spin" />
+                {statusMessage || 'جاري المعالجة...'}
+              </span>
+              <span className="text-text-secondary text-sm">يرجى الانتظار</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Smart paste button */}
+      <div className="flex flex-col gap-1">
         <button 
-          onClick={() => onSendDirect()}
-          disabled={!directInputText.trim() || isProcessing}
-          className="md:col-span-3 h-full py-4 bg-white/5 hover:bg-white/10 rounded-[1.5rem] flex items-center justify-center gap-3 text-white font-black text-lg border border-white/10 transition-all active:scale-95 disabled:opacity-20 shadow-xl"
+          onClick={onPasteAndProcess} disabled={isProcessing}
+          className="w-full p-4 bg-bg-card rounded-2xl flex items-center gap-3 text-text-primary transition-all active:scale-[0.99] hover:border-accent justify-between disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span>إرسال مباشر</span>
-          <Send size={24} className="text-[#00ffa6]" />
+          <div className="w-12 h-12 rounded-xl bg-accent-2 flex items-center justify-center text-bg-main transition-all flex-shrink-0">
+            <ClipboardType size={22} />
+          </div>
+          <span className="text-base font-semibold text-accent-2">لصق و إرسال إلى AI</span>
+          <ChevronLeft size={22} className='text-accent/80'/>
         </button>
       </div>
     </div>

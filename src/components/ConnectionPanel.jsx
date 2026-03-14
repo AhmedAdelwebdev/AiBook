@@ -1,70 +1,71 @@
-import { ClipboardPaste } from 'lucide-react';
+import { Database, FileText, ChevronDown, Plus } from 'lucide-react';
 
 export default function ConnectionPanel({ 
   googleAccessToken, 
-  onAuthenticate, 
   selectedSheetId, 
   setSelectedSheetId, 
   spreadsheets, 
   selectedSheetName, 
   setSelectedSheetName,
-  isProcessing,
-  onProcess,
-  onPasteAndProcess
 }) {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      <div className="lg:col-span-8 grid grid-cols-2 gap-6">
-        {!googleAccessToken ? (
-          <button 
-            onClick={onAuthenticate}
-            className="btn-primary h-16 sm:h-20 rounded-2xl text-xl font-bold flex items-center justify-center gap-4 shadow-2xl transition-all hover:scale-[1.02]"
-          >
-            حساب جوجل
-          </button>
-        ) : (
-          <div className="h-16 sm:h-20 glass rounded-2xl px-8 flex flex-col justify-center border-r-8 border-r-[#00ffa6] shadow-xl">
-            <span className="text-sm font-black tracking-widest text-[#00ffa6] uppercase">ملف البيانات</span>
-            <select 
-              value={selectedSheetId} 
-              onChange={e => { setSelectedSheetId(e.target.value); localStorage.setItem('selected_sheet_id', e.target.value); }}
-              className="bg-transparent text-lg md:text-xl font-black outline-none cursor-pointer appearance-none text-white w-full"
-            >
-              <option value="" className="bg-neutral-900">اختر الملف</option>
-              {spreadsheets.map(f => <option key={f.id} value={f.id} className="bg-neutral-900">{f.name}</option>)}
-            </select>
-          </div>
-        )}
+  if (!googleAccessToken) return null;
 
-        <div className={`h-16 sm:h-20 glass rounded-2xl px-8 flex flex-col justify-center transition-all shadow-xl ${!selectedSheetId ? 'opacity-30 grayscale cursor-not-allowed' : 'opacity-100 border-r-8 border-r-white/20'}`}>
-          <span className="text-sm font-black text-[#00ffa6] tracking-widest mb-2">ورقة العمل</span>
-          <input 
-            value={selectedSheetName} 
-            onChange={e => { setSelectedSheetName(e.target.value); localStorage.setItem('selected_sheet_name', e.target.value); }}
-            className="bg-transparent text-lg md:text-xl font-black outline-none placeholder:opacity-20 text-white"
-            placeholder="مثال: Sheet1"
-            disabled={!selectedSheetId}
-          />
+  const incrementSheetName = () => {
+    const name = selectedSheetName || '';
+    // Match trailing number: e.g. "B11" → "B12", "Sheet3" → "Sheet4", "abc" → "abc1"
+    const match = name.match(/^(.*?)(\d+)$/);
+    let next;
+    if (match) {
+      next = match[1] + (parseInt(match[2], 10) + 1);
+    } else {
+      next = name + '1';
+    }
+    setSelectedSheetName(next);
+    localStorage.setItem('selected_sheet_name', next);
+  };
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-1.5 px-1">
+          <Database size={14} className="text-accent" />
+          <label className="text-text-primary text-sm font-bold">قاعدة البيانات</label>
+        </div>
+        <div className="relative">
+          <select 
+            value={selectedSheetId} 
+            onChange={e => { setSelectedSheetId(e.target.value); localStorage.setItem('selected_sheet_id', e.target.value); }}
+            className="w-full h-11 bg-bg-input border border-border rounded-xl px-4 pr-9 outline-none text-text-primary text-sm font-bold appearance-none cursor-pointer focus:border-accent transition-all"
+          >
+            <option value="" className="bg-bg-main">اختر قاعدة البيانات</option>
+            {spreadsheets.map(f => <option key={f.id} value={f.id} className="bg-bg-main">{f.name}</option>)}
+          </select>
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none">
+            <ChevronDown size={16} />
+          </div>
         </div>
       </div>
 
-      <div className="lg:col-span-4 flex items-center gap-4">
-        <button 
-          onClick={onPasteAndProcess}
-          disabled={isProcessing || !googleAccessToken || !selectedSheetId}
-          title="لصق ومعالجة فورية"
-          className="w-20 h-16 sm:h-20 glass rounded-2xl flex items-center justify-center text-[#00ffa6] border border-[#00ffa6]/20 hover:bg-[#00ffa6]/10 transition-all shadow-xl disabled:opacity-20"
-        >
-          <ClipboardPaste size={32} />
-        </button>       
-         
-        <button 
-          onClick={onProcess} 
-          disabled={isProcessing || !googleAccessToken || !selectedSheetId}
-          className={`flex-1 h-16 sm:h-20 bg-accent/10 text-accent btn-primary rounded-2xl text-2xl font-black disabled:opacity-20 disabled:grayscale transition-all shadow-[0_20px_60px_rgba(0,255,166,0.3)] hover:scale-[1.05] active:scale-95`}
-        >
-          {isProcessing ? 'جاري...' : 'بدء المعالجة'}
-        </button>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-1.5 px-1">
+          <FileText size={14} className="text-accent" />
+          <label className="text-text-primary text-sm font-bold">ورقة العمل</label>
+        </div>
+        <div className="flex gap-2">
+          <input 
+            value={selectedSheetName} 
+            onChange={e => { setSelectedSheetName(e.target.value); localStorage.setItem('selected_sheet_name', e.target.value); }}
+            className="flex-1 h-11 bg-bg-input border border-border rounded-xl px-4 outline-none text-text-primary text-sm font-bold focus:border-accent transition-all text-right"
+            placeholder="مثلاً: Sheet1"
+          />
+          <button
+            onClick={incrementSheetName}
+            title="زيادة الرقم بمقدار 1"
+            className="h-11 w-11 flex-shrink-0 bg-bg-input border border-border rounded-xl flex items-center justify-center text-accent hover:bg-accent hover:text-bg-main hover:border-accent transition-all"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
       </div>
     </div>
   );

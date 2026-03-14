@@ -1,10 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0b0b0b;
-  --color-card: #141414;
-  --color-accent: #00ffa6;
-  --color-foreground: #ffffff;
+  --color-bg-main: #050505;
+  --color-bg-card: #0d1117;
+  --color-bg-input: #161b22;
+  --color-accent: #3be;
+  --color-accent-2: #1d82ae;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a3a3a3;
+  --color-text-dim: #525252;
+  --color-border: #30363d;
+  --color-error: #ef4444;
 }
 
 @font-face {
@@ -19,20 +25,13 @@
 }
 
 body {
-  background-color: var(--color-bg);
-  background-image:
-    radial-gradient(circle at 20% 20%, rgba(0, 255, 166, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(0, 255, 166, 0.03) 0%, transparent 50%),
-    radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 40px 40px;
-  background-attachment: fixed;
-  color: var(--color-foreground);
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
   font-family: 'Tajawal', sans-serif;
   min-height: 100vh;
   margin: 0;
   -webkit-font-smoothing: antialiased;
   direction: rtl;
-  font-size: 1.2rem;
 }
 
 .glass {

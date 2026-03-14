@@ -203,29 +203,43 @@ return text.split("Yasser B4").slice(1).map(t=>t.trim() + "\\n\\n-------------")
     }
   };
 
+  // زر اللصق → AI → Sheets (يتطلب 10 كلمات على الأقل)
   const handlePasteAndSendDirect = async () => {
     try {
       const text = await navigator.clipboard.readText();
       if (!text.trim()) return showToast("الحافظة فارغة.");
-      setDirectInputText(text);
-      await sendDirectToSheet(text);
+      
+      const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+      if (wordCount < 10) {
+        return showToast(`النص قصير جداً (${wordCount} كلمات). الحد الأدنى 10 كلمات.`);
+      }
+      
+      setInputText(text);
+      await startProcessing(text);
     } catch (e) {
       showToast("فشل اللصق، حاول اللصق يدوياً.");
     }
   };
 
+  // زر الإرسال → مباشرة إلى Sheets (أي نص)
   const sendDirectToSheet = async (textToSend) => {
-    const finalSelection = textToSend || directInputText;
-    if (!finalSelection.trim()) return showToast("يرجى إدخال نص أولاً");
+    if (!textToSend || !textToSend.trim()) return showToast("يرجى كتابة نص أولاً");
     if (!googleAccessToken || !selectedSheetId) return showToast("يرجى ربط حساب جوجل واختيار ملف");
 
     setIsProcessing(true);
-    setStatusMessage("جاري الإرسال للشيت مباشرة...");
+    setStatusMessage("جاري الإرسال للشيت...");
     try {
       const googleAuth = { accessToken: googleAccessToken, spreadsheetId: selectedSheetId, sheetName: selectedSheetName };
-      await appendToSheet(googleAuth, { value: finalSelection });
-      showToast("تم إرسال النص للشيت بنجاح!");
-      setDirectInputText('');
+
+      // إذا احتوى النص على فاصلة → قسّمه على أعمدة
+      const parts = textToSend.split(',').map(p => p.trim()).filter(p => p.length > 0);
+      const data = parts.length > 1
+        ? Object.fromEntries(parts.map((v, i) => [i, v]))
+        : { value: textToSend };
+
+      await appendToSheet(googleAuth, data);
+      showToast(parts.length > 1 ? `تم الإرسال في ${parts.length} أعمدة ✓` : "تم الإرسال للشيت ✓");
+      setInputText('');
     } catch(err) {
       setErrorModal({ open: true, message: `فشل الإرسال: ${err.message}` });
     } finally {
