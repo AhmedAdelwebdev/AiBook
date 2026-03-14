@@ -30,7 +30,7 @@ export default function Workspace({
         />
 
         {/* Send button inside textarea */}
-        <div className="absolute bottom-4 right-4 border border-border">
+        <div className="absolute bottom-4 right-4">
           <button 
             onClick={() => onSendDirect()}
             disabled={!inputText.trim() || isProcessing}
@@ -64,7 +64,7 @@ export default function Workspace({
       </div>
 
       {/* Smart paste button */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 border border-border">
         <button 
           onClick={onPasteAndProcess} disabled={isProcessing}
           className="w-full p-4 bg-bg-card rounded-2xl flex items-center gap-3 text-text-primary transition-all active:scale-[0.99] hover:border-accent justify-between disabled:opacity-50 disabled:cursor-not-allowed"
