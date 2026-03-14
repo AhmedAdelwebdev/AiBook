@@ -64,10 +64,10 @@ export default function Workspace({
       </div>
 
       {/* Smart paste button */}
-      <div className="flex flex-col gap-1 border border-border">
+      <div className="flex flex-col gap-1">
         <button 
           onClick={onPasteAndProcess} disabled={isProcessing}
-          className="w-full p-4 bg-bg-card rounded-2xl flex items-center gap-3 text-text-primary transition-all active:scale-[0.99] hover:border-accent justify-between disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full p-4 bg-bg-card border border-border rounded-2xl flex items-center gap-3 text-text-primary transition-all active:scale-[0.99] hover:border-accent justify-between disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <div className="w-12 h-12 rounded-xl bg-accent-2 flex items-center justify-center text-bg-main transition-all flex-shrink-0">
             <ClipboardType size={22} />
