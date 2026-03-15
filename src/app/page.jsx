@@ -80,7 +80,10 @@ export default function Home() {
             setGoogleAccessToken={setGoogleAccessToken}
             settings={settings}
             setSettings={setSettings}
-            saveSettings={saveSettings}
+            saveSettings={() => {
+              saveSettings(showToast);
+              // setActiveTab('home');
+            }}
             showToast={showToast}
           />
         )}

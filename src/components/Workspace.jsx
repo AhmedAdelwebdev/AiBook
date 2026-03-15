@@ -44,11 +44,11 @@ export default function Workspace({
           onClick={onPasteAndProcess} disabled={isProcessing}
           className="w-full p-4 bg-card border border-border rounded-2xl flex items-center gap-3 text-text1 transition-all active:scale-[0.99] hover:border-accent justify-between disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center text-body transition-all flex-shrink-0">
-            <ClipboardType size={22} />
+          <div className="w-12 h-12 rounded-lg bg-accent/10 border border-accent/20 text-accent flex items-center justify-center transition-all flex-shrink-0">
+            <ClipboardType size={24} />
           </div>
           <span className="text-base font-semibold text-accent">لصق و إرسال إلى AI</span>
-          <ChevronLeft size={22} className='text-accent/80' />
+          <ChevronLeft size={24} className='text-accent/80' />
         </button>
       </div>
     </div>

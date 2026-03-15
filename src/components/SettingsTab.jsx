@@ -1,4 +1,4 @@
-import { Key, Globe, Terminal, Type, Save, Copy, ClipboardPaste, Cpu, Zap, Settings2 } from 'lucide-react';
+import { Brain, Globe, Terminal, Type, Copy, ClipboardPaste, Cpu, Zap, Settings2 } from 'lucide-react';
 
 const InputWrapper = ({ label, icon: Icon, children, description }) => (
   <div className="flex flex-col gap-3 group">
@@ -56,7 +56,7 @@ export default function SettingsTab({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* API Section */}
         <div className="flex flex-col gap-8">
-          <InputWrapper label="Groq Key" icon={Key} description="AI ENGINE">
+          <InputWrapper label="Groq Key" icon={Brain} description="AI ENGINE">
             <input
               type="text" dir="ltr"
               value={settings.GROQ_API_KEY || ''}
@@ -66,7 +66,7 @@ export default function SettingsTab({
             />
           </InputWrapper>
 
-          <InputWrapper label="Google Client" icon={Globe} description="CLOUD STORAGE">
+          <InputWrapper label="Google Client ID" icon={Globe} description="CLOUD STORAGE">
             <input
               type="text" dir="ltr"
               value={settings.GOOGLE_CLIENT_ID || ''}
@@ -102,7 +102,7 @@ export default function SettingsTab({
       </div>
 
       {/* Full Width Section */}
-      <InputWrapper label="توجيهات النظام (Prompt)" icon={Type} description="AI INTELLIGENCE">
+      <InputWrapper label="توجيهات النظام" icon={Type} description="AI INTELLIGENCE">
         <textarea
           rows={6}
           value={settings.SYSTEM_PROMPT || ''}
