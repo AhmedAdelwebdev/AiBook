@@ -3,7 +3,7 @@
 import HomeTab from '@/components/HomeTab';
 import SettingsTab from '@/components/SettingsTab';
 import Modals from '@/components/Modals';
-import { useRecipeApp } from '@/hooks/useRecipeApp';
+import { useAppLogic } from '@/hooks/useAppLogic';
 import { useState } from 'react';
 import Header from '@/components/Header';
 
@@ -31,7 +31,7 @@ export default function Home() {
     handlePasteAndProcess,
     sendDirectToSheet,
     handlePasteAndSendDirect
-  } = useRecipeApp();
+  } = useAppLogic();
 
   const [activeTab, setActiveTab] = useState('home');
 
@@ -91,13 +91,6 @@ export default function Home() {
         setResultModal={setResultModal}
         errorModal={errorModal}
         setErrorModal={setErrorModal}
-        showSettings={false}
-        setShowSettings={() => { }}
-        settings={settings}
-        setSettings={setSettings}
-        onSaveSettings={saveSettings}
-        showToast={showToast}
-        onSignOut={() => { }}
       />
 
       {toast.show && (

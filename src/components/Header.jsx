@@ -27,16 +27,11 @@ export default function Header({
             <div className="flex items-center gap-2">
               <button
                 onClick={onSignOut}
-                className="flex items-center gap-2 px-4 py-2 bg-error/5 text-error border border-error/20 rounded-xl font-bold text-sm hover:bg-error hover:text-white transition-all active:scale-95"
+                className="flex items-center gap-2 px-5 py-2 bg-card text-text2 border border-border rounded-full font-bold text-sm hover:text-accent hover:border-accent transition-all active:scale-95 shadow-sm"
               >
                 <LogOut size={16} />
                 <span>خروج</span>
               </button>
-
-              <div className="bg-accent/10 text-accent px-3 py-1.5 rounded-xl font-bold text-xs border border-accent/20 flex items-center gap-1.5 hidden sm:flex">
-                <ShieldCheck size={14} />
-                <span>متصل</span>
-              </div>
             </div>
           )}
         </div>

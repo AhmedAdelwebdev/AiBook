@@ -4,12 +4,7 @@ import { CheckCheck } from "lucide-react";
 
 export default function Modals({
   resultModal, setResultModal,
-  errorModal, setErrorModal,
-  showSettings, setShowSettings,
-  settings, setSettings,
-  onSaveSettings,
-  showToast,
-  onSignOut
+  errorModal, setErrorModal
 }) {
   return (
     <>

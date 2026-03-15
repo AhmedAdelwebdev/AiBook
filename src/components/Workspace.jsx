@@ -4,8 +4,6 @@ export default function Workspace({
   inputText,
   setInputText,
   isProcessing,
-  progress,
-  statusMessage,
   onSendDirect,
   onPasteAndProcess
 }) {
@@ -38,27 +36,6 @@ export default function Workspace({
             <ChevronLeft size={20} />
           </button>
         </div>
-
-
-        {/* Processing overlay */}
-        {isProcessing && (
-          <div className="absolute inset-0 bg-body/95 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-50">
-            <div className="relative w-20 h-20 md:w-24 md:h-24 flex items-center justify-center">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="6" className="text-border" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="6" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * progress) / 100} className="text-accent" strokeLinecap="round" />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-xl font-black text-text1">{progress}%</div>
-            </div>
-            <div className="flex flex-col items-center gap-1 text-center px-4">
-              <span className="text-accent text-base font-black flex items-center gap-2">
-                <Loader2 size={16} className="animate-spin" />
-                {statusMessage || 'جاري المعالجة...'}
-              </span>
-              <span className="text-text2 text-sm">يرجى الانتظار</span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Smart paste button */}

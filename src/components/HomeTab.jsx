@@ -1,21 +1,14 @@
-import Header from './Header';
 import Workspace from './Workspace';
 import ConnectionPanel from './ConnectionPanel';
 
 export default function HomeTab({
   googleAccessToken,
-  authenticateGoogle,
   inputText,
   setInputText,
-  directInputText,
-  setDirectInputText,
   isProcessing,
   progress,
   statusMessage,
-  startProcessing,
   sendDirectToSheet,
-  handlePasteAndSendDirect,
-  settings,
   selectedSheetId,
   setSelectedSheetId,
   spreadsheets,
@@ -29,8 +22,6 @@ export default function HomeTab({
         inputText={inputText}
         setInputText={setInputText}
         isProcessing={isProcessing}
-        progress={progress}
-        statusMessage={statusMessage}
         onSendDirect={() => sendDirectToSheet(inputText)}
         onPasteAndProcess={handlePasteAndProcess}
       />
