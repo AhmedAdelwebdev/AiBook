@@ -4,7 +4,7 @@ const InputWrapper = ({ label, icon: Icon, children, description }) => (
   <div className="flex flex-col gap-3 group">
     <div className="flex items-center justify-between px-2">
       <div className="flex items-center gap-2.5">
-        <div className="p-1.5 rounded-lg bg-accent/10 text-accent group-focus-within:bg-accent group-focus-within:text-body transition-all duration-500">
+        <div className="p-2.5 rounded-lg bg-accent/10 text-accent group-focus-within:bg-accent group-focus-within:text-body transition-all duration-500">
           <Icon size={16} />
         </div>
         <span className="text-sm font-black text-text1/90 tracking-wide">{label}</span>
